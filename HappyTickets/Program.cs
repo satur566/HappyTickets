@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,9 @@ namespace HappyTickets
 {
     class Program
     {
-        private static void MultipleForMethod()
+        private static int MultipleForMethod()
         {
+            int counter = 0;
             for (int a = 0; a < 10; a++)
             {
                 for (int b = 0; b < 10; b++)
@@ -24,7 +26,7 @@ namespace HappyTickets
                                 {
                                     if((a + b + c) == (d + e +f))
                                     {
-                                        Console.WriteLine($"{a}{b}{c}{d}{e}{f}");
+                                        counter++;
                                     }
                                 }
                             }
@@ -32,10 +34,15 @@ namespace HappyTickets
                     }
                 }
             }
+            return counter;
         }
         static void Main(string[] args)
-        {            
-            MultipleForMethod();
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"Перебор циклами нашел {MultipleForMethod()} билетов.");
+            stopwatch.Stop();
+            Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
         }
     }
 }
