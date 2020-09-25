@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HappyTickets
 {
-    class Program
+    public static class Program
     {
         private static int MultipleForMethod(int countOfDigits)
         {
@@ -204,35 +204,96 @@ namespace HappyTickets
 
         static void Main(string[] args)
         {
-            StringMethod(2);
+            /*StringMethod(2);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Console.WriteLine($"Перебор циклами нашел {MultipleForMethod(11)} билетов.");
             stopwatch.Stop();
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
-            stopwatch.Reset();
+            stopwatch.Reset();*/
+            Console.WriteLine(countOfTicketsForDigit(5, true));
         }
-
 
         //IT'S BIG BRAIN TIME!
 
-
-        static long figureDigit(int i, int k)
+        public static double alternateFigureNumber(double i, double k)
         {
-            if ((i < 0) || (k < 0))
+            double result;
+            if (k < 2)
+            {
+                result = 1;
+            } else
+            {
+                if (i < 0) //
+                {
+                    result = 0;
+                }
+                else if (i == 0)
+                {
+                    result = 1;
+                } else
+                {
+                    double previousRoot = alternateFigureNumber(i - 1, k);
+                    double rootDiff = 0;
+                    if (k == 2)
+                    {
+                        if (i > 9 && i < 19)
+                        {
+                            rootDiff = -1;
+                        }
+                        else if (i < 10)
+                        {
+                            rootDiff = 1;
+                        }
+                        else rootDiff = 0;
+                    } else
+                    {
+                        double previousFigureNumber = alternateFigureNumber(i, k - 1);
+                        double coefficient = alternateFigureNumber(i - 10, k - 1);
+                        rootDiff = previousFigureNumber - coefficient;
+                    }
+                    result = previousRoot + rootDiff;
+                }
+            }
+            return result;
+        }
+        static double figureNumber(double i, double k) //tested and this is bullshit.
+        {
+            if (i < 0)
             {
                 return 0;
             }
-            int n = i + 1;
-            long result = (n + k - 2) / (k - 1) * figureDigit(i, k - 1);
+            if (k == 1)
+            {
+                {
+                    return 1;
+                }
+            }
+            double n = i + 1;
+            double result = (n + (k - 2)) / (k - 1) * figureNumber(i, k - 1);
             return result;
         }
 
-        static long coutOfTicketsForDigit(int i, int k)
+        static double countOfTicketsForDigit(double k, bool withZero)
         {
-            long result = figureDigit(i, k) + figureDigit(i, k - 1) + figureDigit(i - 10, k - 1);
-            long doubleResult = (long) Math.Pow(result, 2);
-            return doubleResult;
+            double result = 0;
+            int theHalf = (int) k * 9 / 2;
+            for (int i = 0; i < k * 9; i++)
+            {
+                if (i <= theHalf)
+                {
+                    if (i == 19) //THERE IS A BIG BUG!
+                    {
+                        Console.ReadKey();
+                    }
+                    result += Math.Pow(alternateFigureNumber(i, k), 1);
+                } else
+                {
+                    int mirrorIndex = i - theHalf;
+                    result += Math.Pow(alternateFigureNumber(mirrorIndex, k), 1);
+                }
+            }
+            return withZero? result + 1 : result;
         }
     }
 }
