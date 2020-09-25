@@ -199,6 +199,9 @@ namespace HappyTickets
             string str = ticketNumber.ToString();
             return counter;
         }
+
+        //Small brain code above Main.
+
         static void Main(string[] args)
         {
             StringMethod(2);
