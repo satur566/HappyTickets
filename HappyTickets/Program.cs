@@ -45,12 +45,9 @@ namespace HappyTickets
                                             }
                                         }
                                     }
-                                    //Console.WriteLine($"{a+b+c}\t{subCounter}");
-                                    //subCounter = 0;
                                 }
                             }
                         }
-                        Console.WriteLine($"{subCounter}");
                         subCounter = 0;
                     }
                     break;
@@ -88,7 +85,6 @@ namespace HappyTickets
                                 }
                             }
                         }
-                        Console.WriteLine($"{i} {subCounter}");
                         subCounter = 0;
                     }
                     break;
@@ -131,7 +127,6 @@ namespace HappyTickets
                                 }
                             }
                         }
-                        Console.WriteLine($"{i} {subCounter}");
                         subCounter = 0;
                     }
                     break;
@@ -180,7 +175,6 @@ namespace HappyTickets
                                 }
                             }
                         }
-                        Console.WriteLine($"{i} {subCounter}");
                         subCounter = 0;
                     }
                     break;
@@ -204,14 +198,15 @@ namespace HappyTickets
 
         static void Main(string[] args)
         {
-            /*StringMethod(2);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            Console.WriteLine($"Перебор циклами нашел {MultipleForMethod(11)} билетов.");
+            Console.WriteLine($"По моей собственной формуле найдено {countOfTicketsForDigit(5, true)} билетов.");
             stopwatch.Stop();
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
-            stopwatch.Reset();*/
-            Console.WriteLine(countOfTicketsForDigit(5, true));
+            stopwatch.Restart();
+            Console.WriteLine($"По методу перебора циклами найдено {MultipleForMethod(10)} билетов.");
+            stopwatch.Stop();
+            Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
         }
 
         //IT'S BIG BRAIN TIME!
@@ -237,11 +232,11 @@ namespace HappyTickets
                     double rootDiff = 0;
                     if (k == 2)
                     {
-                        if (i > 9 && i < 19)
+                        if (i >= 10 && i <=19)
                         {
                             rootDiff = -1;
                         }
-                        else if (i < 10)
+                        else if (i <= 9)
                         {
                             rootDiff = 1;
                         }
@@ -282,15 +277,11 @@ namespace HappyTickets
             {
                 if (i <= theHalf)
                 {
-                    if (i == 19) //THERE IS A BIG BUG!
-                    {
-                        Console.ReadKey();
-                    }
-                    result += Math.Pow(alternateFigureNumber(i, k), 1);
+                    result += Math.Pow(alternateFigureNumber(i, k), 2);
                 } else
                 {
                     int mirrorIndex = i - theHalf;
-                    result += Math.Pow(alternateFigureNumber(mirrorIndex, k), 1);
+                    result += Math.Pow(alternateFigureNumber(mirrorIndex, k), 2);
                 }
             }
             return withZero? result + 1 : result;
