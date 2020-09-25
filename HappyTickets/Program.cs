@@ -209,5 +209,27 @@ namespace HappyTickets
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
             stopwatch.Reset();
         }
+
+
+        //IT'S BIG BRAIN TIME!
+
+
+        static long figureDigit(int i, int k)
+        {
+            if ((i < 0) || (k < 0))
+            {
+                return 0;
+            }
+            int n = i + 1;
+            long result = (n + k - 2) / (k - 1) * figureDigit(i, k - 1);
+            return result;
+        }
+
+        static long coutOfTicketsForDigit(int i, int k)
+        {
+            long result = figureDigit(i, k) + figureDigit(i, k - 1) + figureDigit(i - 10, k - 1);
+            long doubleResult = (long) Math.Pow(result, 2);
+            return doubleResult;
+        }
     }
 }
