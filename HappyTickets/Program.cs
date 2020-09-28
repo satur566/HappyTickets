@@ -198,13 +198,18 @@ namespace HappyTickets
 
         static void Main(string[] args)
         {
+            SmartSolutions ss = new SmartSolutions();            
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            Console.WriteLine($"По моей собственной формуле найдено {countOfTicketsForDigit(5, true)} билетов.");
+            Console.WriteLine($"По моей собственной формуле v2 найдено {ss.countOfTicketsForDigit(1000, true)} билетов.");
             stopwatch.Stop();
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
             stopwatch.Restart();
-            Console.WriteLine($"По методу перебора циклами найдено {MultipleForMethod(10)} билетов.");
+            Console.WriteLine($"По моей собственной формуле найдено {countOfTicketsForDigit(10, true)} билетов.");
+            stopwatch.Stop();
+            Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
+            stopwatch.Restart();
+            Console.WriteLine($"По методу перебора циклами найдено {MultipleForMethod(8)} билетов.");
             stopwatch.Stop();
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
         }
@@ -219,7 +224,7 @@ namespace HappyTickets
                 result = 1;
             } else
             {
-                if (i < 0) //
+                if (i < 0)
                 {
                     result = 0;
                 }
