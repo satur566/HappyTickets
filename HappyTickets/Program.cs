@@ -201,7 +201,7 @@ namespace HappyTickets
             SmartSolutions ss = new SmartSolutions();            
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            Console.WriteLine($"По моей собственной формуле v2 найдено {ss.countOfTicketsForDigit(1000, true)} билетов.");
+            Console.WriteLine($"По моей собственной формуле v2 найдено {ss.countOfTicketsForDigit(5, true)} билетов.");
             stopwatch.Stop();
             Console.WriteLine($"На это ушло {stopwatch.ElapsedMilliseconds} миллисекунд.");
             stopwatch.Restart();
@@ -283,7 +283,7 @@ namespace HappyTickets
                 if (i <= theHalf)
                 {
                     result += Math.Pow(alternateFigureNumber(i, k), 2);
-                } else
+                } else //Remove and just double upper value + depends on odd or even -double or not double last value.
                 {
                     int mirrorIndex = i - theHalf;
                     result += Math.Pow(alternateFigureNumber(mirrorIndex, k), 2);

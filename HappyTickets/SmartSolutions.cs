@@ -8,47 +8,53 @@ namespace HappyTickets
 {
     class SmartSolutions
     {
-        public SmartSolutions() { } //TODO: заполнить при инициализации класса. 0 и 1 сублисты значениями 000000000 и 111111111-1-1-1-1-1-1-1-1-1
-        
-        private List<List<long>> speedTable = new List<List<long>>();
-
+        List<List<long>> speedTable = new List<List<long>>();
         public List<List<long>> SpeedTable
         {
             get
             {
-                if (speedTable.Count.Equals(0))
-                {
-                    speedTable.Insert(0, new List<long>());
-                    for (int i = 0; i < 10; i++)
-                    {
-                        speedTable[0].Insert(i, 1);
-                    }
-                }
                 return speedTable;
             }
         }
+        
+        public SmartSolutions() 
+        {
+            SpeedTable.Insert(0, new List<long>());
+            for (int i = 0; i < 10; i++)
+            {
+                SpeedTable[0].Insert(i, 1);
+            }
+            SpeedTable.Insert(1, new List<long>());
+            for (int i = 0; i < 10; i++)
+            {
+                SpeedTable[1].Insert(i, i + 1);
+            }
+            for (int i = 10, j = 9; i < 20; i++, j--)
+            {
+                SpeedTable[1].Insert(i, j);
+            }
+        } //TODO: заполнить при инициализации класса. 0 и 1 сублисты значениями 000000000 и 111111111-1-1-1-1-1-1-1-1-1                      
 
         private void AddToTable (int i, int k, long value)
         {
             k--;
-            if(speedTable.Count < k)
+            if(SpeedTable.Count <= k)
             {
-                for (int j = speedTable.Count; j < k; j++)
+                for (int j = SpeedTable.Count; j <= k; j++)
                 {
-                    speedTable.Add(new List<long>());
-                }
-                speedTable.Insert(k, new List<long>());
+                    SpeedTable.Add(new List<long>());
+                }                
             }
             try
             {
-                if (speedTable[k][i] > 0)
+                if (SpeedTable[k][i] > 0)
                 {
                     return;
                 }
             }
             catch 
             {
-                speedTable[k].Insert(i, value);
+                SpeedTable[k].Insert(i, value);
             }                                        
         }
 
@@ -75,7 +81,7 @@ namespace HappyTickets
                     long previousRoot = 0;
                     try
                     {
-                        previousRoot = speedTable[k - 1][i - 1];
+                        previousRoot = SpeedTable[k - 1][i - 1];
                     }
                     catch
                     {
@@ -99,7 +105,7 @@ namespace HappyTickets
                         long previousFigureNumber = 0;
                         try
                         {
-                            previousFigureNumber = speedTable[k - 2][i];
+                            previousFigureNumber = SpeedTable[k - 2][i];
                         }
                         catch
                         {
@@ -108,7 +114,7 @@ namespace HappyTickets
                         long coefficient = 0;
                         try
                         {
-                            coefficient = speedTable[k - 2][i - 10];
+                            coefficient = SpeedTable[k - 2][i - 10];
                         }
                         catch
                         {
