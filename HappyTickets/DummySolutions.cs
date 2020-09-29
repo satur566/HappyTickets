@@ -18,12 +18,9 @@ namespace HappyTickets
                 case 1:
                 case 2:
                 case 3:
-                    return 9;
+                    return 10;
                 case 4:
                 case 5:
-                    for (int i = 1; i <= 18; i++)
-                    {
-                        counter = 0;
                         for (int a = 0; a < 10; a++)
                         {
                             for (int b = 0; b < 10; b++)
@@ -34,30 +31,15 @@ namespace HappyTickets
                                     {
                                         if ((a + b) == (c + d))
                                         {
-                                            if (i == 18)
-                                            {
                                                 counter++;
-                                            }
-                                            if (c + d == i)
-                                            {
-                                                subCounter++;
-                                            }
                                         }
                                     }
-                                    //Console.WriteLine($"{a+b+c}\t{subCounter}");
-                                    //subCounter = 0;
                                 }
                             }
                         }
-                        Console.WriteLine($"{subCounter}");
-                        subCounter = 0;
-                    }
                     break;
                 case 6:
                 case 7:
-                    for (int i = 1; i <= 27; i++)
-                    {
-                        counter = 0;
                         for (int a = 0; a < 10; a++)
                         {
                             for (int b = 0; b < 10; b++)
@@ -72,29 +54,19 @@ namespace HappyTickets
                                             {
                                                 if ((a + b + c) == (d + e + f))
                                                 {
-                                                    if (i == 27)
-                                                    {
+
                                                         counter++;
-                                                    }
-                                                    if (d + e + f == i)
-                                                    {
-                                                        subCounter++;
-                                                    }
+
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        Console.WriteLine($"{i} {subCounter}");
-                        subCounter = 0;
-                    }
+                        }                    
                     break;
                 case 8:
                 case 9:
-                    for (int i = 1; i <= 36; i++)
-                    {
                         for (int a = 0; a < 10; a++)
                         {
                             for (int b = 0; b < 10; b++)
@@ -113,14 +85,7 @@ namespace HappyTickets
                                                     {
                                                         if ((a + b + c + d) == (e + f + g + h))
                                                         {
-                                                            if (i == 36)
-                                                            {
                                                                 counter++;
-                                                            }
-                                                            if (e + f + g + h == i)
-                                                            {
-                                                                subCounter++;
-                                                            }
                                                         }
                                                     }
                                                 }
@@ -130,14 +95,9 @@ namespace HappyTickets
                                 }
                             }
                         }
-                        Console.WriteLine($"{i} {subCounter}");
-                        subCounter = 0;
-                    }
                     break;
                 case 10:
                 case 11:
-                    for (int i = 1; i <= 45; i++)
-                    {
                         for (int a = 0; a < 10; a++)
                         {
                             for (int b = 0; b < 10; b++)
@@ -160,14 +120,7 @@ namespace HappyTickets
                                                             {
                                                                 if ((a + b + c + d + e) == (f + g + h + j + k))
                                                                 {
-                                                                    if (i == 45)
-                                                                    {
                                                                         counter++;
-                                                                    }
-                                                                    if (f + g + h + j + k == i)
-                                                                    {
-                                                                        subCounter++;
-                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -179,26 +132,41 @@ namespace HappyTickets
                                 }
                             }
                         }
-                        Console.WriteLine($"{i} {subCounter}");
-                        subCounter = 0;
-                    }
                     break;
             }
             return counter;
         }
-        private int StringMethod(int numberOfDigits)
+        public long StringMethod(int numberOfDigits)
         {
-            int counter = 0;
+
+            numberOfDigits = numberOfDigits > 2 ? numberOfDigits - numberOfDigits % 2 : numberOfDigits;
+            long counter = 1;
             StringBuilder ticketNumber = new StringBuilder();
-            ticketNumber.Append("1");
             for (int i = 0; i < numberOfDigits; i++)
             {
-                ticketNumber.Insert(0, "0");
+                ticketNumber.Append("9");
             }
-            string str = ticketNumber.ToString();
+            long highestNumber = Convert.ToInt64(ticketNumber.ToString());
+            for (long i = 0; i < highestNumber; i++)
+            {
+                counter += SimpleCounter(i.ToString().PadLeft(numberOfDigits, '0'));
+            }
             return counter;
         }
 
-        //Small brain code above Main.
+        private int SimpleCounter(string ticketNumber)
+        {
+            int divider = ticketNumber.Length / 2;
+            string firstPart = ticketNumber.Substring(0, divider);
+            string secondPart = ticketNumber.Substring(divider);
+            int firstSum = 0;
+            int secondSum = 0;
+            for (int i = 0; i < firstPart.Length; i++)
+            {
+                firstSum += Convert.ToInt32(firstPart[i]);
+                secondSum += Convert.ToInt32(secondPart[i]);                
+            }
+            return firstSum.Equals(secondSum) ? 1 : 0;
+        }
     }
 }
