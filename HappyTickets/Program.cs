@@ -7,7 +7,23 @@ namespace HappyTickets
     {
         static void Main() //Messy code, but priority is find some interesting unordinary smart solutions and compare completition time there.
         {
-            
+            Console.Write("Задайте коэфициент k: ");
+            int k = Convert.ToInt32(Console.ReadLine());
+            SmartSolutions smartSolutions = new SmartSolutions();
+            DummySolutions dummySolutions = new DummySolutions();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"Поиск счастливых билетов длиной {k * 2} самодельным методом. Найдено: {smartSolutions.SumRootPowerOptimized(k, true)}");
+            stopwatch.Stop();
+            Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
+            stopwatch.Restart();
+            Console.WriteLine($"Поиск счастливых билетов длиной {k * 2} методом перебора циклами. Найдено: {dummySolutions.DummiestOne(k * 2)}");
+            stopwatch.Stop();
+            Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
+            stopwatch.Restart();
+            Console.WriteLine($"Поиск счастливых билетов длиной {k * 2} довольно глупым строковым методом. Найдено: {dummySolutions.StringMethod(k * 2)}");
+            stopwatch.Stop();
+            Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
         }
     }
 }
