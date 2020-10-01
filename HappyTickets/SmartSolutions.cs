@@ -3,6 +3,42 @@ using System.Collections.Generic;
 
 namespace HappyTickets
 {
+    /// Почему это работает?
+    /// 
+    /// Допустим, что имеется полный набор классических транспортных билетов, но их длина равна n.
+    /// 
+    /// В таком случае для четного n будут действовать следущие правила:
+    /// 
+    /// 1) (очевидное) Сравниваемые части будут иметь длину k = n / 2.
+    /// 2) Сумма цифр (i) любой из сравниваемых частей не будет превышать k*9.
+    /// 3) Количество счастливых билетов (E) для каждого i всегда равно квадрату какого-либо натурального числа. Пример: 
+    ///     для шестизначного билета: i = 1, Е(1) = 9, i = 2, E(2) = 36 и т.д.
+    /// 4) Ряд корней каждого E(i) для определенного k (F(k,i)) будет вычисляться по формуле:
+    ///     
+    ///     F(k, i) = F(k, i - 1) + F(k - 1, i) - F(k - 1, i - 10) ,
+    ///     
+    ///     при этом:
+    ///     - если i < 0, то F(k,i) = 0;
+    ///     - если i = 0, то F(k,i) = 1;
+    ///     - если i > 0 и k = {0,1}, то F(k,i) = 1.
+    ///   
+    /// 5) Таким образом формула вычисления количества счастливых билетов любой четной длины равна:
+    /// 
+    ///     для 0 <= i <= k*9
+    ///     
+    ///     happyTickets = ∑(F(k,i)^2)
+    ///     
+    /// Для нечетного n расчет происходит иначе:
+    /// 
+    /// 1) Сравниваемые части будут иметь длину k = n / 2 - 1, т.е. сравниваются только первые и последние части длиной k. Середина исключается.
+    ///     Таким образом получаем билет четной длины.
+    /// 2) После расчета количества счастливых билетов для полученного билета четной длины, результат нужно умножить на 10.
+    ///     
+    /// Таким образом можно рекурсивно, аналогично задаче о поиске факториала, вычислить такой корень (метод ниже).
+    /// А если еще и заполнять своеобразную таблицу значений, то поиск ускоряется на несколько порядков.
+    /// 
+    /// P.S. Это все придумал сам, без гугла и прочего за пару бессонных вечеров.
+
     public class SmartSolutions
     {
         public List<List<long>> SpeedTable { get; } = new List<List<long>>();
@@ -46,51 +82,13 @@ namespace HappyTickets
             {
                 SpeedTable[k].Insert(i, value);
             }
-        }
-
-        double FigureNumber(double k, double i) //figure number - good. But needs to calculate first, second etc rows up to K. lame method. Costs too much time for now. Throw it to deeeeeeeep box.
-        {
-            if (k == 1)
-            {
-                return 1;
-            }
-            double n = i + 1;
-            return (n + (k - 2)) / (k - 1) * FigureNumber(k - 1, i);
-        }
-
-        /// Почему это работает?
-        /// 
-        /// Будем называть счастливым билетом совпадение суммы каждой цифры k-значного числа с суммой любого другого k-значного числа.
-        /// В таком случае для каждого ряда чисел от 0 до N, длина которого в цифрах равна K*2 (т.е. для K=3, N будет ограничен 999999) 
-        /// будет действовать следующие правила:
-        /// 1) Количество разчилных сумм цифр правой или левой половины счастливого билета будет равно K*9.
-        /// 2) Количеством таких билетов, приходящихся на каждую сумму - будет являтся число, из которого можно извлечь целый корень.
-        /// 3) Первые 10 таких корней - фигурные числа порядка K, так при K=3 это будут треугольные числа 1,3,6,10, при K=4 - тетраэдральные и т.д.
-        ///     Исчисляются по формуле(при k >=3): F(k,i) = (n + (k - 2))/(k - 1) * F(k - 1, i);
-        /// 4) Все последующие корни - являются фигурными числами порядка K с вычитанием определенного коэфициента, равного F(k-1,i)-F(k-1, i - 10);
-        /// 
-        /// Таким образом можно вычислить количество счастливых билетов любой длины, при условии, что длина - четное число.
-        /// 
-        /// Но существует иной способ:
-        /// 
-        /// Каждый корень можно вычислить по формуле F(k, i) = F(k, i -1) + F(k - 1, i) - F(k - 1, i - 10)
-        /// при следующих условиях:
-        /// 1) Для любого i:
-        ///     если k = 0, 1, то F = 1;        
-        /// 2) Для любого k:
-        ///     a) если i = 0, F = 1; 
-        ///     б) если i < 0, F = 0;
-        /// 
-        /// Таким образом можно рекурсивно, аналогично задаче о поиске факториала, вычислить такой корень (метод ниже).
-        /// А если еще и заполнять своеобразную таблицу значений, то поиск ускоряется на несколько порядков.
-        /// 
-        /// P.S. Это все придумал сам, без гугла и прочего за пару бессонных вечеров, а потом много времени убил на первую часть, так и не доделав. Зато сделал вторую =)
+        }               
 
         /// <summary>
-        /// Функция F(k, i), вычисляющая i-e число ряда фигурных чисел порядка k, измененное на определенный коэфициент.
+        /// Функция F(k, i), вычисляющая корень из суммы счастливых билетов, равных i.
         /// </summary>
-        /// <param name="k">Порядок фигурного числа.</param>
-        /// <param name="i">Номер фигурного часла в ряду.</param>
+        /// <param name="k">Длина сравниваемой части.</param>
+        /// <param name="i">Сумма цифр сравниваемой части.</param>
         /// <returns>Корень суммы счастливых билетов, равных i.</returns>
         private long CalculateRoot(int k, int i) //TODO: replace try-catch with something...good.
         {
@@ -165,48 +163,71 @@ namespace HappyTickets
         /// <summary>
         /// Вычисляет сумму квадратов значений функции.
         /// </summary>
-        /// <param name="k">Количество цифр в каждом из сравниваемых чисел ряда.</param>
+        /// <param name="k">Количество цифр в билете.</param>
         /// <param name="withZero">Исключить билет, состоящий из нулей. Ведь в реальной жизни такого билета нет.</param>
         /// <returns>Количество счастливых билетов для k*2 значного билета.</returns>
-        public double SumRootPower(int k, bool withZero)
+        public double SumRootPower(int n, bool withZero)
         {
+            int k = n / 2;
+            int remainder = n % 2;
             double result = 0;
             int limit = k * 9;
-            for (int i = 0; i < limit; i++)
+            for (int i = 0; i <= limit; i++)
             {
                 result += Math.Pow(CalculateRoot(k, i), 2);
             }
-            return withZero ? result + 1 : result;
+            if (remainder.Equals(1))
+            {
+                result *= 10;
+            }
+            return withZero ? result : result - 1;
         }
         /// <summary>
-        /// Вычисляет сумму квадратов значений функции. Оптимизирована для большого количества цифр в числе ряда.
+        /// Вычисляет сумму квадратов значений функции. Оптимизирована для большого количества цифр в билете.
         /// </summary>
-        /// <param name="k">Количество цифр в каждом из сравниваемых чисел ряда.</param>
+        /// <param name="k">Количество цифр в билете.</param>
         /// <param name="withZero">Исключить билет, состоящий из нулей. Ведь в реальной жизни такого билета нет.</param>
         /// <returns>Количество счастливых билетов для k*2 значного билета.</returns>
-        public double SumRootPowerOptimized(int k, bool withZero)
+        public double SumRootPowerOptimized(int n, bool withZero)
         {
+            int k = n / 2;
+            int remainder = n % 2;
+            int kRemainder = k % 2;
             double result = 0;
-            int limit = k * 9 / 2;
-            int remainder = k * 9 % 2;
+            int limit = k * 9 / 2;            
             for (int i = 0; i < limit; i++)
             {
                 result += Math.Pow(CalculateRoot(k, i), 2);
             }
             result += result;
-            for (int i = 0; i <= remainder; i++)
+            for (int i = 0; i <= kRemainder; i++)
             {
                 result += Math.Pow(CalculateRoot(k, limit), 2);
+            }
+            if (remainder.Equals(1))
+            {
+                result *= 10;
             }
             return withZero ? result : result - 1;
         }
 
-        public double SumRootPowerSpecial(int k, bool withZero) //USELESS FOR NOW.
+        //Skip me
+        double FigureNumber(double k, double i) //figure number - good. But needs to calculate first, second etc rows up to K. lame method. Costs too much time for now. Throw it to deeeeeeeep box.
+        {
+            if (k == 1)
+            {
+                return 1;
+            }
+            double n = i + 1;
+            return (n + (k - 2)) / (k - 1) * FigureNumber(k - 1, i);
+        }
+        //Don't look at me, I'm not ready yet.
+        public double SumRootPowerSpecial(int n, bool withZero) //USELESS FOR NOW.
         {
             double result = 0;
-            for (int i = 0; i < k * 9; i++)
+            for (int i = 0; i < n * 9; i++)
             {
-                double value = FigureNumber(Convert.ToDouble(k), Convert.ToDouble(i));
+                double value = FigureNumber(Convert.ToDouble(n), Convert.ToDouble(i));
                 result += Math.Pow(value, 2);
                 Console.WriteLine(value);
             }
