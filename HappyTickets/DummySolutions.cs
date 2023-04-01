@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
-
-namespace HappyTickets
+﻿namespace HappyTickets
 {
+    using System;
+    using System.Text;
+
     public class DummySolutions //Dummiest thoughts are collected there =)
     {
         public DummySolutions() { }
@@ -135,7 +135,6 @@ namespace HappyTickets
                             }
                         }
                     }
-                    counter *= 10;
                     break;
                 case 9:
                         for (int a = 0; a < 10; a++)
@@ -166,6 +165,7 @@ namespace HappyTickets
                                 }
                             }
                         }
+                    counter *= 10;
                     break;
                 case 10:
                     for (int a = 0; a < 10; a++)
@@ -270,7 +270,7 @@ namespace HappyTickets
             for (int i = 0; i < firstPart.Length; i++)
             {
                 firstSum += Convert.ToInt32(firstPart[i]);
-                secondSum += Convert.ToInt32(secondPart[i]);                
+                secondSum += Convert.ToInt32(secondPart[i]);
             }
             return firstSum.Equals(secondSum) ? 1 : 0;
         }
