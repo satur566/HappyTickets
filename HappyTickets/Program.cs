@@ -1,40 +1,89 @@
-﻿using System;
-using System.Diagnostics;
-
-namespace HappyTickets
+﻿namespace HappyTickets
 {
-    static class Program
+    using System;
+    using System.Diagnostics;
+
+    internal static class Program
     {
-        static void Main() //Messy code, but priority is find some interesting unordinary smart solutions and compare completition time there.
-            //And yep, no exception handling untill I finish this task.
+        private static void Main()
         {
             Console.Write("Задайте длину билета: ");
-            int k = Convert.ToInt32(Console.ReadLine());
-            SmartSolutions smartSolutions = new SmartSolutions();
-            SmartSolutions smartSolutionsDuplicate = new SmartSolutions();
-            DummySolutions dummySolutions = new DummySolutions();
-            Stopwatch stopwatch = new Stopwatch();
+            int ticketDigitsCount = Convert.ToInt32(Console.ReadLine());
+            Stopwatch stopwatch = new();
             stopwatch.Start();
-            Console.WriteLine($"Поиск счастливых билетов длиной {k} самодельным методом c оптимизацией. Найдено: {smartSolutions.SumRootPowerOptimized(k, true)}");
+
+            /*
+             * Неоптимизированный самодельный метод
+             */
+            double unoptimalSmartSolutionResult =
+                SmartSolutions
+                    .CreateSolution()
+                    .WithZeroTicket()
+                    .WithTicketDigitCount(ticketDigitsCount)
+                    .CalculateUnoptimally()
+                    .GetResult();
+
+            Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} самодельным методом c оптимизацией. Найдено: {unoptimalSmartSolutionResult}");
             stopwatch.Stop();
             Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
             stopwatch.Restart();
-            Console.WriteLine($"Поиск счастливых билетов длиной {k} самодельным методом без оптимизации. Найдено: {smartSolutionsDuplicate.SumRootPower(k, true)}");
+
+            /*
+             * Оптимизированный самодельный метод
+             */
+            double optimalSmartSolutionResult =
+                SmartSolutions
+                    .CreateSolution()
+                    .WithZeroTicket()
+                    .WithTicketDigitCount(ticketDigitsCount)
+                    .CalculateOptimally()
+                    .GetResult();
+
+            Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} самодельным методом без оптимизации. Найдено: {optimalSmartSolutionResult}");
             stopwatch.Stop();
             Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
-            if (k > 11)
+
+            /*
+             * Глупый метод перебора циклами.
+             */
+            if (ticketDigitsCount > 11)
             {
-                Console.WriteLine("Я не буду это считать.");
+                Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} методом перебора циклами не может быть посчитан.");
             }
             else
             {
                 stopwatch.Restart();
-                Console.WriteLine($"Поиск счастливых билетов длиной {k} методом перебора циклами. Найдено: {dummySolutions.DummiestOne(k)}");
+                double dummiestMethodResult =
+                    DummySolutions
+                        .CreateSolution()
+                        .WithZeroTicket()
+                        .WithTicketDigitCount(ticketDigitsCount)
+                        .DummiestOne()
+                        .GetResult();
+
+                Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} методом перебора циклами. Найдено: {dummiestMethodResult}");
                 stopwatch.Stop();
                 Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
             }
+
+            /*
+             * Простенький, но очень долгий метод подсчета через конвертацию строки.
+             */
+            if (ticketDigitsCount > 8)
+            {
+                Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} довольно глупым строковым методом будет идти долго. Запасись терпением.");
+            }
+
             stopwatch.Restart();
-            Console.WriteLine($"Поиск счастливых билетов длиной {k} довольно глупым строковым методом. Найдено: {dummySolutions.StringMethod(k)}");
+            double stringMethodResult =
+                DummySolutions
+                    .CreateSolution()
+                    .WithZeroTicket()
+                    .WithTicketDigitCount(ticketDigitsCount)
+                    .StringMethod()
+                    .GetResult();
+
+            Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} довольно глупым строковым методом. Найдено: {stringMethodResult}");
             stopwatch.Stop();
             Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
         }
