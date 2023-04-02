@@ -2,220 +2,162 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
-    /// Почему это работает?
-    ///
-    /// Допустим, что имеется полный набор классических транспортных билетов, но их длина равна n.
-    ///
-    /// В таком случае для четного n будут действовать следущие правила:
-    ///
-    /// 1) (очевидное) Сравниваемые части будут иметь длину k = n / 2.
-    /// 2) Сумма цифр (i) любой из сравниваемых частей не будет превышать k*9.
-    /// 3) Количество счастливых билетов (E) для каждого i всегда равно квадрату какого-либо натурального числа. Пример:
-    ///     для шестизначного билета: i = 1, Е(1) = 9, i = 2, E(2) = 36 и т.д.
-    /// 4) Ряд корней каждого E(i) для определенного k (F(k,i)) будет вычисляться по формуле:
-    ///
-    ///     F(k, i) = F(k, i - 1) + F(k - 1, i) - F(k - 1, i - 10) ,
-    ///
-    ///     при этом:
-    ///     - если i < 0, то F(k,i) = 0;
-    ///     - если i = 0, то F(k,i) = 1;
-    ///     - если i > 0 и k = {0,1}, то F(k,i) = 1.
-    ///
-    /// 5) Таким образом формула вычисления количества счастливых билетов любой четной длины равна:
-    ///
-    ///     для 0 <= i <= k*9
-    ///
-    ///     happyTickets = ∑(F(k,i)^2)
-    ///
-    /// Для нечетного n расчет происходит иначе:
-    ///
-    /// 1) Сравниваемые части будут иметь длину k = n / 2 - 1, т.е. сравниваются только первые и последние части длиной k. Середина исключается.
-    ///     Таким образом получаем билет четной длины.
-    /// 2) После расчета количества счастливых билетов для полученного билета четной длины, результат нужно умножить на 10.
-    ///
-    /// Таким образом можно рекурсивно, аналогично задаче о поиске факториала, вычислить такой корень (метод ниже).
-    /// А если еще и заполнять своеобразную таблицу значений, то поиск ускоряется на несколько порядков.
-    ///
-    /// P.S. Это все придумал сам, без гугла и прочего за пару бессонных вечеров.
-
-    internal class SmartSolutions
+    internal class SmartSolutions : AbstractSolution<SmartSolutions>
     {
-        //TODO: add cache
         private readonly List<List<long>> _speedTable = new();
+
+        internal static SmartSolutions CreateSolution() => new();
 
         internal SmartSolutions()
         {
-            this._speedTable.Insert(0, new List<long>());
-            for (int i = 0; i < 10; i++)
-            {
-                this._speedTable[0].Add(1);
-            }
-
-            this._speedTable.Insert(1, new List<long>());
-            for (int i = 0; i < 10; i++)
-            {
-                this._speedTable[1].Add(i + 1);
-            }
-
-            for (int i = 10, j = 9; i < 20; i++, j--)
-            {
-                this._speedTable[1].Add(j);
-            }
+            this._speedTable.Insert(0, Enumerable.Range(0, 10).Select(e => (long)e).ToList());
+            this._speedTable.Insert(1, Enumerable.Range(1, 10).Select(e => (long)e).ToList());
+            this._speedTable[1].AddRange(Enumerable.Range(0, 10).Reverse().Select(e => (long)e));
         }
 
         /// <summary>
-        ///
+        /// Вычисляет количество счастливых билетов методом фигурных чисел.
         /// </summary>
-        /// <param name="k">Длина сравниваемой части.</param>
-        /// <param name="i">Сумма цифр сравниваемой части.</param>
-        /// <param name="value"></param>
-        private void AddToTable(int k, int i, long value)
+        internal SmartSolutions CalculateUnoptimally()
         {
-            if (this._speedTable.Count <= --k)
+            int comparedPartsLength = this.DigitsCount / 2;
+            double result = 0;
+            for (int i = 0; i <= comparedPartsLength * 9; i++)
             {
-                for (int j = this._speedTable.Count; j <= k; j++)
-                {
-                    this._speedTable.Add(new List<long>());
-                }
+                result += Math.Pow(this.CalculateRoot(comparedPartsLength, i), 2);
             }
 
-            if (this._speedTable.HasElementAtIndexesOf(k, i)
-                && this._speedTable[k][i] > 0
-            )
+            if (this.DigitsCount % 2 == 1)
             {
-                return;
+                result *= 10;
             }
 
-            this._speedTable[k].Insert(i, value);
+            this.Result = this.CalculateWithZeroTicket ? result : result - 1;
+            return this;
+        }
+
+        /// <summary>
+        /// Вычисляет количество счастливых билетов методом фигурных чисел. Оптимизированный метод.
+        /// </summary>
+        public SmartSolutions CalculateOptimally()
+        {
+            int comparedPartsLength = this.DigitsCount / 2;
+            double result = 0;
+            int limit = comparedPartsLength * 9 / 2;
+            for (int i = 0; i < limit; i++)
+            {
+                result += Math.Pow(this.CalculateRoot(comparedPartsLength, i), 2);
+            }
+
+            result += result;
+            for (int i = 0; i <= comparedPartsLength % 2; i++)
+            {
+                result += Math.Pow(this.CalculateRoot(comparedPartsLength, limit), 2);
+            }
+
+            if (this.DigitsCount % 2 == 1)
+            {
+                result *= 10;
+            }
+
+            this.Result = this.CalculateWithZeroTicket ? result : result - 1;
+            return this;
         }
 
         /// <summary>
         /// Функция F(k, i), вычисляющая корень из суммы счастливых билетов, равных i.
         /// </summary>
-        /// <param name="k">Длина сравниваемой части.</param>
-        /// <param name="i">Сумма цифр сравниваемой части.</param>
-        /// <returns>Корень суммы счастливых билетов, равных i.</returns>
-        private long CalculateRoot(int k, int i)
+        /// <param name="comparedPartsLength">Длина сравниваемой части.</param>
+        /// <param name="comparedPartsSum">Сумма цифр сравниваемой части.</param>
+        /// <returns>Корень суммы счастливых билетов, равных сумме цифр сравниваемых частей.</returns>
+        private long CalculateRoot(int comparedPartsLength, int comparedPartsSum)
         {
-            long result;
-            if (k < 2)
+            if (comparedPartsLength < 2)
             {
                 return 1;
             }
 
-            if (i < 0)
+            if (comparedPartsSum < 0)
             {
                 return 0;
             }
 
-            if (i == 0)
+            if (comparedPartsSum == 0)
             {
-                this.AddToTable(k, i, 1);
+                this.AddToTable(comparedPartsLength, comparedPartsSum, 1);
                 return 1;
             }
 
-            long previousRoot = this._speedTable.HasElementAtIndexesOf(k - 1, i - 1)
-                ? this._speedTable[k - 1][i - 1]
-                : this.CalculateRoot(k, i - 1);
+            long previousRoot = this._speedTable.HasElementAtIndexesOf(comparedPartsLength - 1, comparedPartsSum - 1)
+                ? this._speedTable[comparedPartsLength - 1][comparedPartsSum - 1]
+                : this.CalculateRoot(comparedPartsLength, comparedPartsSum - 1);
 
-            long rootDiff;
-            if (k == 2)
-            {
-                rootDiff = i is >= 10 and <= 19
-                    ? -1
-                    : i <= 9
-                        ? 1
-                        : 0;
-
-                result = previousRoot + rootDiff;
-                this.AddToTable(k, i, result);
-                return result;
-            }
-
-            long previousFigureNumber = this._speedTable.HasElementAtIndexesOf(k - 2, i)
-                    ? this._speedTable[k - 2][i]
-                    : this.CalculateRoot(k - 1, i);
-
-            long coefficient = this._speedTable.HasElementAtIndexesOf(k - 2, i - 10)
-                ? this._speedTable[k - 2][i - 10]
-                : this.CalculateRoot(k - 1, i - 10);
-
-            rootDiff = previousFigureNumber - coefficient;
-            result = previousRoot + rootDiff;
-            this.AddToTable(k, i, result);
+            long rootDiff = this.CalculateRootDifference(comparedPartsLength, comparedPartsSum);
+            long result = previousRoot + rootDiff;
+            this.AddToTable(comparedPartsLength, comparedPartsSum, result);
             return result;
         }
 
         /// <summary>
-        /// Вычисляет сумму квадратов значений функции.
+        /// Добавляет в таблицу найденных значений значение.
         /// </summary>
-        /// <param name="k">Количество цифр в билете.</param>
-        /// <param name="withZero">Исключить билет, состоящий из нулей. Ведь в реальной жизни такого билета нет.</param>
-        /// <returns>Количество счастливых билетов для k*2 значного билета.</returns>
-        public double SumRootPower(int n, bool withZero)
+        /// <param name="comparedPartsLength">Длина сравниваемой части.</param>
+        /// <param name="comparedPartsSum">Сумма цифр сравниваемой части.</param>
+        /// <param name="value">Значение.</param>
+        private void AddToTable(int comparedPartsLength, int comparedPartsSum, long value)
         {
-            int k = n / 2;
-            int remainder = n % 2;
-            double result = 0;
-            int limit = k * 9;
-            for (int i = 0; i <= limit; i++)
+            if (this._speedTable.Count <= --comparedPartsLength)
             {
-                result += Math.Pow(this.CalculateRoot(k, i), 2);
+                this._speedTable.AddRange(
+                    Enumerable
+                        .Range(this._speedTable.Count, comparedPartsLength)
+                        .Select(e => new List<long>())
+                    );
             }
 
-            if (remainder.Equals(1))
+            if (this._speedTable.HasElementAtIndexesOf(comparedPartsLength, comparedPartsSum)
+                && this._speedTable[comparedPartsLength][comparedPartsSum] > 0
+            )
             {
-                result *= 10;
+                return;
             }
 
-            return withZero ? result : result - 1;
+            this._speedTable[comparedPartsLength].Insert(comparedPartsSum, value);
         }
 
         /// <summary>
-        /// Вычисляет сумму квадратов значений функции. Оптимизирована для большого количества цифр в билете.
+        /// Вычисляет разницу между корнями для сравниваемых чисел заданной длины и суммы цифр.
         /// </summary>
-        /// <param name="k">Количество цифр в билете.</param>
-        /// <param name="withZero">Исключить билет, состоящий из нулей. Ведь в реальной жизни такого билета нет.</param>
-        /// <returns>Количество счастливых билетов для k*2 значного билета.</returns>
-        public double SumRootPowerOptimized(int n, bool withZero)
+        /// <param name="comparedPartsLength">Длина сравниваемой части.</param>
+        /// <param name="comparedPartsSum">Сумма цифр сравниваемой части.</param>
+        /// <returns>Разница между корнями.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
+        private long CalculateRootDifference(int comparedPartsLength, int comparedPartsSum)
         {
-            int k = n / 2;
-            int remainder = n % 2;
-            int kRemainder = k % 2;
-            double result = 0;
-            int limit = k * 9 / 2;
-            for (int i = 0; i < limit; i++)
+            if (comparedPartsLength != 2)
             {
-                result += Math.Pow(this.CalculateRoot(k, i), 2);
+                long previousFigureNumber = this._speedTable.HasElementAtIndexesOf(comparedPartsLength - 2, comparedPartsSum)
+                        ? this._speedTable[comparedPartsLength - 2][comparedPartsSum]
+                        : this.CalculateRoot(comparedPartsLength - 1, comparedPartsSum);
+
+                long coefficient = this._speedTable.HasElementAtIndexesOf(comparedPartsLength - 2, comparedPartsSum - 10)
+                    ? this._speedTable[comparedPartsLength - 2][comparedPartsSum - 10]
+                    : this.CalculateRoot(comparedPartsLength - 1, comparedPartsSum - 10);
+
+                return previousFigureNumber - coefficient;
             }
 
-            result += result;
-            for (int i = 0; i <= kRemainder; i++)
+            if (comparedPartsSum is >= 10 and <= 19)
             {
-                result += Math.Pow(this.CalculateRoot(k, limit), 2);
+                return -1;
             }
 
-            if (remainder.Equals(1))
-            {
-                result *= 10;
-            }
-
-            return withZero ? result : result - 1;
+            return comparedPartsSum <= 9 ? 1 : 0;
         }
 
-        double FigureNumber(double k, double i)
-        {
-            if (k == 1)
-            {
-                return 1;
-            }
-
-            double n = i + 1;
-            return (n + (k - 2)) / (k - 1) * this.FigureNumber(k - 1, i);
-        }
-
-        //Don't look at me, I'm not ready yet.
+        #region Future part
         public double SumRootPowerSpecial(int n, bool withZero)
         {
             double result = 0;
@@ -228,5 +170,11 @@
 
             return withZero ? result + 1 : result;
         }
+
+        private double FigureNumber(double k, double i) =>
+            k != 1
+                ? (i + k - 1) / (k - 1) * this.FigureNumber(k - 1, i)
+                : 1;
+        #endregion
     }
 }
