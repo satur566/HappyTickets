@@ -44,27 +44,20 @@
             Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
 
             /*
-             * Глупый метод перебора циклами.
+             * Метод двух массивов
              */
-            if (ticketDigitsCount > 11)
-            {
-                Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} методом перебора циклами не может быть посчитан.");
-            }
-            else
-            {
-                stopwatch.Restart();
-                double dummiestMethodResult =
-                    DummySolutions
-                        .CreateSolution()
-                        .WithZeroTicket()
-                        .WithTicketDigitCount(ticketDigitsCount)
-                        .DummiestOne()
-                        .GetResult();
+            stopwatch.Restart();
+            double twoArraysMethodResult =
+                DummySolutions
+                    .CreateSolution()
+                    .WithZeroTicket()
+                    .WithTicketDigitCount(ticketDigitsCount)
+                    .TwoArraysMethod()
+                    .GetResult();
 
-                Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} методом перебора циклами. Найдено: {dummiestMethodResult}");
-                stopwatch.Stop();
-                Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
-            }
+            Console.WriteLine($"Поиск счастливых билетов длиной {ticketDigitsCount} методом двух массивов. Найдено: {twoArraysMethodResult}");
+            stopwatch.Stop();
+            Console.WriteLine($"Затрачено времени: {stopwatch.ElapsedMilliseconds} мс.");
 
             /*
              * Простенький, но очень долгий метод подсчета через конвертацию строки.

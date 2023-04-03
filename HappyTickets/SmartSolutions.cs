@@ -8,8 +8,6 @@
     {
         private readonly List<List<long>> _speedTable = new();
 
-        internal static SmartSolutions CreateSolution() => new();
-
         internal SmartSolutions()
         {
             this._speedTable.Insert(0, Enumerable.Range(0, 10).Select(e => (long)e).ToList());
